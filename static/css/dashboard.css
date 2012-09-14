@@ -1,0 +1,87 @@
+body {
+  font-family:“Lucida Grande”, sans-serif;
+  font-size:10px;
+}
+
+#header {
+  margin-top:10px;
+}
+
+#header-text {
+  color:#999999;
+}
+
+.dashboard-widget {
+  margin-top:10px;
+  margin-bottom:10px;
+}
+
+#bar {
+	width:610px;
+	margin:auto;
+}
+
+#vis2 {
+	width:800px;
+	margin:auto;
+}
+
+#vis3 {
+	width:375px;
+	margin:auto;
+}
+
+#vis4 {
+	width:375px;
+	margin:auto;
+}
+
+#vis5 {
+	width:515px;
+	margin:auto;
+}
+
+#vis6 {
+	width:475px;
+	margin:auto;
+}
+
+.x line, .y line {
+  stroke:#ccc;
+  shape-rendering:crispEdges;
+}
+
+path {
+  stroke:#ccc;
+  stroke-width:1px;
+  fill:none;
+}
+
+h3 {
+  text-align:center;
+  color: #777;
+}
+
+img {
+  height:225px;
+  width:275px;
+}
+
+.visual_container {
+	margin-left:auto;
+}
+
+
+.chart div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+.chart rect {
+  stroke: white;
+  fill: steelblue;
+}

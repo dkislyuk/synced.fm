@@ -1,0 +1,18 @@
+#search_bar {
+    -moz-border-radius:0px 0px 5px 5px; -webkit-border-radius:0px 0px 5px 5px; border-radius:0px 0px 5px 5px;
+    box-shadow: 0px 0px 5px #ccc; -moz-box-shadow: 0px 0px 5px #ccc; -webkit-box-shadow: 0px 0px 5px #ccc;
+    padding: 10px 13px;
+    margin-bottom: 10px;
+    background-color: #fff;
+}
+
+.search_field {
+    padding: 3px;
+    width: 185px;
+    font-size: 15px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    border: 1px solid #dedede;
+
+}

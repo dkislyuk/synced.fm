@@ -1,0 +1,67 @@
+<html ng-app="synced">
+<head>
+	<!--
+	<link rel="stylesheet" type="text/css" media="screen" href="/static/css/main.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/static/css/track/track.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/static/css/track/track_forms.css" />
+  	<link rel="stylesheet" type="text/css" media="screen" href="/static/css/search.css" /> -->
+
+
+  	<script src="/static/lib/jquery/jquery-1.7.1.min.js"></script>
+  	<script src="/static/lib/angular/angular.js"></script>
+  	<script src="/static/lib/angular/angular-resource.js"></script>
+  	<script src="/static/app.js"></script>
+  	<script src="/static/js/services.js"></script>
+  	<script src="/static/js/directives.js"></script>
+
+  	<script src="/static/js/controllers/track_controller.js"></script>
+  	<script src="/static/js/controllers/user_controller.js"></script>
+
+  	<!-- TODO: Customize Bootstrap -->
+  	<link href="/static/css/bootstrap/bootstrap.css" rel="stylesheet">
+  	<link href="/static/css/bootstrap/bootstrap-responsive.css" rel="stylesheet">
+  	<script src="/static/lib/bootstrap/bootstrap.min.js"></script>
+</head>
+<body>
+	<div class="navbar navbar-inverse">
+	  <div class="navbar-inner">
+	    <a class="brand" href="#">Synced.fm</a>
+	    <ul class="nav">
+	      <li class="active"><a href="#">Home</a></li>
+	      <li><a href="#">Link</a></li>
+	      <li><a href="#">Link</a></li>
+	      <li><a href="#"><ng:include src="'/static/views/shared/user_status.html'"></ng:include></a></li>
+	    </ul>
+
+	    <form class="navbar-search pull-right">
+  			<input type="text" class="search-query" placeholder="Search">
+		</form>
+
+		
+	  </div>
+	</div>
+
+
+	<div class="row">
+  		<div class="span4">...</div>
+  		<div class="span8">        
+  			<div id="content">
+            	<div ng-view></div>
+        	</div>
+       	</div>
+	</div>
+	    <div id="container">
+
+<!--         <div id="search_bar">
+            <input class="search_field" type="text" id="search" size="50" />
+            | <ng:include src="'/static/views/shared/user_status.html'"></ng:include>
+        </div> -->
+
+      <div id="push"></div>
+    </div>
+    <div id="footer">
+      <p>© Synced.fm</p>
+    </div>
+	
+</body>
+</html>

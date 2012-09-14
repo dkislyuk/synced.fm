@@ -1,0 +1,26 @@
+#header-text {
+  color:#999999;
+}
+
+#track_container {
+
+}
+
+#base_tracks {
+
+}
+
+
+#track_info {
+    font-family: Yanone Kaffeesatz, Arial, Helvetica Neue, sans-serif; color:#84968D;
+    padding: 5px;
+}
+
+#track_name {
+    font-size: 20px;
+}
+
+#track_artist {
+    font-size: 16px;
+
+}

@@ -1,0 +1,3 @@
+function TrackDetailController($scope, $routeParams) {
+	
+}
