@@ -1,4 +1,5 @@
 from base import BaseModel
+import hashlib
 
 class MinLengthValidator(object):
     def __init__(self, min_length):
@@ -22,3 +23,4 @@ class User(BaseModel):
     validators = {
         'username' : MinLengthValidator(3)
     }
+    

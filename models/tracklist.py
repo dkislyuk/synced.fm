@@ -1,6 +1,6 @@
 from base import BaseModel
 
-# Tracklists are ADTs used for all other track collections
+# Tracklists are ADTs used for all other track-aggregations
 class Tracklist(BaseModel):   
     structure = {
         'tracklist' : [basestring],
@@ -8,6 +8,7 @@ class Tracklist(BaseModel):
     }
     
     required_fields = ['tracklist', 'artist']
+
 
 class Set(Tracklist):
     __collection__ = 'sets'
@@ -18,12 +19,33 @@ class Set(Tracklist):
     
     required_fields = ['date']
 
+
 class Episode(Tracklist):
-    pass
+    __collection__ = 'episodes'
+    
+    structure = {
+        'date' : basestring
+    }
+    
+    required_fields = ['date']
+
 
 class Mix(Tracklist):
-    pass
+    __collection__ = 'mixes'
+    
+    structure = {
+        'date' : basestring
+    }
+    
+    required_fields = ['date']
+
 
 class Playlist(Tracklist):
-    pass
+    __collection__ = 'playlists'
+    
+    structure = {
+        'date' : basestring
+    }
+    
+    required_fields = ['date']
 

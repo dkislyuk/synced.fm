@@ -1,10 +1,10 @@
 <html ng-app="synced">
 <head>
-	<!--
+
 	<link rel="stylesheet" type="text/css" media="screen" href="/static/css/main.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="/static/css/track/track.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="/static/css/track/track_forms.css" />
-  	<link rel="stylesheet" type="text/css" media="screen" href="/static/css/search.css" /> -->
+  <link rel="stylesheet" type="text/css" media="screen" href="/static/css/search.css" />
 
 
   	<script src="/static/lib/jquery/jquery-1.7.1.min.js"></script>
@@ -28,8 +28,6 @@
 	    <a class="brand" href="#">Synced.fm</a>
 	    <ul class="nav">
 	      <li class="active"><a href="#">Home</a></li>
-	      <li><a href="#">Link</a></li>
-	      <li><a href="#">Link</a></li>
 	      <li><a href="#"><ng:include src="'/static/views/shared/user_status.html'"></ng:include></a></li>
 	    </ul>
 
@@ -43,20 +41,14 @@
 
 
 	<div class="row">
-  		<div class="span4">...</div>
+
   		<div class="span8">        
   			<div id="content">
             	<div ng-view></div>
         	</div>
        	</div>
 	</div>
-	    <div id="container">
-
-<!--         <div id="search_bar">
-            <input class="search_field" type="text" id="search" size="50" />
-            | <ng:include src="'/static/views/shared/user_status.html'"></ng:include>
-        </div> -->
-
+	<div id="container">
       <div id="push"></div>
     </div>
     <div id="footer">

@@ -69,8 +69,7 @@ def classify(track):
     params = 'mfcc: MFCC blockSize=' + str(2 * config["mfcc_step_size"]) + ' stepSize=' + str(config["mfcc_step_size"]) + ' > Derivate DOrder=1'
     fp.addFeature(params)
     
-    df = fp.getDataFlow()
-    
+    df = fp.getDataFlow()   
     afp = AudioFileProcessor()
 
     test_engine = Engine()
@@ -82,8 +81,7 @@ def classify(track):
     test_classifier = GMM(n_components = config["num_components"], cvtype = 'full')
     test_classifier.fit(test_data, thresh = config["em_epsilon"], n_iter = config["em_iter"])
 
-    h0 = []
-    h1 = []
+    result = []
 
     p_eval = test_classifier.eval(test_data)[0]
     for key, datum in training_data.iteritems():
@@ -93,16 +91,12 @@ def classify(track):
         probs = [0.0] * 2
         
         for i in xrange(test_data.shape[0]):
-            if (q_eval[i] <= 1.0):
-                q_eval[i] = 1.0 
+            if (q_eval[i] <= 1.0): q_eval[i] = 1.0 
             
             KL_pq = p_eval[i] * np.log(p_eval[i] / q_eval[i])
             KL_qp = q_eval[i] * np.log(q_eval[i] / p_eval[i])
             
-            probs[0] += KL_pq
             probs[1] += KL_pq + KL_qp
-            
-        heapq.heappush(h0, (probs[0], key))
-        heapq.heappush(h1, (probs[1], key))
 
-    return h1
+        heapq.heappush(result, (probs[1], key))
+    return result

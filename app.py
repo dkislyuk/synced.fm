@@ -1,40 +1,43 @@
-import os, sys
-from api import API
-from flask import Flask, jsonify, render_template, url_for, request, json
-from mongokit import Connection
+import os
 
+from flask import _app_ctx_stack
+from flask import Flask, jsonify, render_template, url_for, request, json
+from flask.ext.mongoengine import MongoEngine
+
+import db
+
+from controllers.track_controller import track_api
+from controllers.tag_controller import tag_api
+from controllers.user_controller import user_api
+ 
+# Global JSON return
 class MyFlask(Flask):
     def make_response(self, rv):
         if hasattr(rv, 'to_json'):
             return jsonify(rv.to_json())
         return Flask.make_response(self, rv)
 
-app = Flask(__name__)
-api = API()
+app = MyFlask(__name__)
+app.config.from_pyfile('config/app.conf')
+db_engine = MongoEngine(app)
+db_engine.init_app(app)
 
-@app.route('/api/track/create', methods=['POST'])
-def create_track():
+db.init_app(app)
 
-    return api.create_track(request.data)
 
-@app.route('/api/track/<action>', methods=['POST'])
-def track(action):
-    ret = api.get_track(123)
-    
-    #app.logger.debug(' event: ', ret)
-    return ret.to_json()
+app.register_blueprint(track_api)
+app.register_blueprint(tag_api)
+app.register_blueprint(user_api)
 
 @app.route('/api/user/login', methods=['POST'])
 def login():
     status = api.login(request.data)
-    
     return status.to_json()
 
 @app.route('/api/user/signup', methods=['POST'])
 def signup():
     status = api.create_user(request.data)
-    
-    return status
+    return status.to_json()
 
 
 @app.route('/')
@@ -44,8 +47,5 @@ def index(section = None, action = None):
     return render_template('index.html')
 
 if __name__ == '__main__':
-    print "running";
-    # Bind to PORT if defined, otherwise default to 5000.
-    #port = int(os.environ.get('PORT', 5000))
-    port = 2727
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)

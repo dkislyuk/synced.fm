@@ -13,7 +13,7 @@ var module = angular.module('synced.services', ['ngResource']);
 
 module.factory('Track', function($resource) {
 	/* If the parameter value is prefixed with @ then the value of that parameter is extracted from the data object (useful for non-GET operations). */
-	return $resource('/api/track/:track_id.json', 
+	return $resource('/api/track/:track_id', 
 		{ track_id: '@id' }, {
 		// action1: {method:?, params:?, isArray:?}, 
 		// create: {method: 'POST'},
@@ -21,6 +21,19 @@ module.factory('Track', function($resource) {
 	});
 });
 
+// module.factory('Track', function($resource) {
+//   $resource.url('/api/track/:track_id', {
+//     track_id : '@id',
+//   },{
+//     query : 	{ method : 'GET', isArray : true },
+//     save : 		{ method : 'PUT' }, /* Update method */
+//     create : 	{ method : 'POST' },
+//     destroy : 	{ method : 'DELETE' }
+//   })
+// });
+
+
+//module.factory('Track', function($http) {
 
 // 	// return {
 
@@ -33,4 +46,5 @@ module.factory('Track', function($resource) {
 // 	// 	}
 // 	// }
 // });
+//});
 

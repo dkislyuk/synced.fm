@@ -1,20 +1,9 @@
 <div id="track_container">
-	<select ng-model="template" ng-options="t.name for t in templates">
-       <option value="">(blank)</option>
-    </select>
-      url of the template: <tt>{{template.url}}</tt>
-    <hr/>
-
-
-
-
-
-
     <div id="track_generated_title">
 		  <span ng-repeat="artist in form.artist_info[0].artists">
-			 <span ng-class="{editing: artist._edit}">{{artist.name}}</span>
+			 <span ng-class="{editing: artist.$$edit}">{{artist.name}}</span>
       </span>
-        - <span ng-class="{editing: title_edit}">{{ form.title }}</span>	
+        <span>- </span><span ng-class="{editing: title_edit}">{{ form.title }}</span>	
 
    	</div>
     <hr/>
@@ -25,16 +14,6 @@
         	<input type="text" ng-model="form.title" placeholder="Enter Title..." ui-event="{ focus: 'title_edit = true', blur : 'title_edit = false' }" required/> <br/><br/>
         </div>
 
-    
-<!--         <label>Address:</label> <br/>
-        <input type="text" ng-model="form.address.line1" size="33" required/> <br/>
-        <input type="text" ng-model="form.address.city" size="12" required/>,
-        <input type="text" ng-model="form.address.state" size="2"
-               ng-pattern="state" required/>
-        <input type="text" ng-model="form.address.zip" size="5"
-               ng-pattern="zip" required/><br/><br/> -->
-
-
         <label>Artists:</label>
         [ <a href="" ng-click="add_artist()">add</a> ]
         <div ng-repeat="artist in form.artist_info[0].artists">
@@ -42,7 +21,7 @@
             <option>primary</option>
             <option>vocalist</option>
           </select>
-          <input type="text" ng-model="artist.name" ng-change="generate_title()" ui-event="{ focus: 'artist._edit = true', blur : 'artist._edit = false' }" required/>
+          <input type="text" ng-model="artist.name" ng-change="generate_title()" ui-event="{ focus: 'artist.$$edit = true', blur : 'artist.$$edit = false' }" required/>
            [ <a href="" ng-click="remove_artist(artist)">X</a> ]
         </div>
       <button ng-click="cancel()" ng-disabled="isCancelDisabled()">Cancel</button>

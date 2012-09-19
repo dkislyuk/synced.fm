@@ -1,9 +1,11 @@
 from base import BaseModel
+from mongokit import Connection
 
 class Track(BaseModel): 
     __collection__ = 'tracks'
        
     structure = {
+        'track_id': int,
         'title' : basestring,
         'artist_info' : [{
             'artists' : [{
@@ -15,12 +17,14 @@ class Track(BaseModel):
             'hidden': []
         }],
         'base_track': [],
-        'id': int,
         'modifier': {},
         'derivatives': [],
         'mixes': [],
+        'tags': []
     }
     
+    required = ['title', 'artist_info', 'track_id']
+    
+  
     def to_json(self):
         return {'user' : 'test', 'id': 123 }
-

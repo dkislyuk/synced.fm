@@ -7,6 +7,10 @@ app.config(['$routeProvider','$locationProvider', function($routeProvider, $loca
       when('/track/new',         { templateUrl: '/static/views/track/new.html',   controller: TrackFormsController}).
       when('/track/:track_id',   { templateUrl: '/static/views/track/index.html', controller: TrackController}).
 
+      /* Tag routing */
+      //when('/tag/new',           { templateUrl: '/static/views/track/new.html',   controller: TrackFormsController}).
+      when('/track/:tag_id',     { templateUrl: '/static/views/track/index.html', controller: TrackController}).
+
       /* User routing */
       when('/signup',            { templateUrl: '/static/views/user/new.html',    controller: UserSignupController}).
       otherwise({redirectTo: '/track/new'});
