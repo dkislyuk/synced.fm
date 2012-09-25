@@ -24,3 +24,5 @@ class User(BaseModel):
         'username' : MinLengthValidator(3)
     }
     
+    def set_password(self, password):
+        self.password = "test"

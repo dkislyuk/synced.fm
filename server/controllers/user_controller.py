@@ -1,5 +1,7 @@
 from flask import Blueprint, request, current_app
 from models.user import User
+#from app import login_manager
+#from api import app
 
 user_api = Blueprint('user_api', __name__)
 
@@ -14,4 +16,9 @@ def create_user(params):
 @user_api.route('/api/login', methods=['POST'])
 def login(params):
     pass
+
+
+#@current_app.login_manager.user_loader
+def load_user(userid):
+    return current_app.login_manager
 

@@ -2,14 +2,11 @@ import os
 
 from flask import _app_ctx_stack
 from flask import Flask, jsonify, render_template, url_for, request, json
-from flask.ext.mongoengine import MongoEngine
+#from flask.ext.mongoengine import MongoEngine
+#from flask.ext.login import LoginManager
 
 import db
 
-from controllers.track_controller import track_api
-from controllers.tag_controller import tag_api
-from controllers.user_controller import user_api
- 
 # Global JSON return
 class MyFlask(Flask):
     def make_response(self, rv):
@@ -19,16 +16,22 @@ class MyFlask(Flask):
 
 app = MyFlask(__name__)
 app.config.from_pyfile('config/app.conf')
-db_engine = MongoEngine(app)
-db_engine.init_app(app)
+#db_engine = MongoEngine(app)
+#db_engine.init_app(app)
 
 db.init_app(app)
+#login_manager = LoginManager()
+#login_manager.setup_app(app)
 
+from controllers.track_controller import track_api
+from controllers.tag_controller import tag_api
+from controllers.user_controller import user_api
 
 app.register_blueprint(track_api)
 app.register_blueprint(tag_api)
 app.register_blueprint(user_api)
 
+#@login_manager.user_loader
 @app.route('/api/user/login', methods=['POST'])
 def login():
     status = api.login(request.data)
