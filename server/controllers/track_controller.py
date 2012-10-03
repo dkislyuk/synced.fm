@@ -1,12 +1,12 @@
 import sys
-import db
+from server import db
 
 from flask import Blueprint, request, current_app
-from models.track import Track
+from server.models.track import Track
 from mongokit import Connection
 track_api = Blueprint('track_api', __name__)
 
-@track_api.route('/api/track', methods=['POST'])    
+@track_api.route('/api/track', methods=['POST'])
 def create_track():
     connection = db.get_connection([Track])
     track = connection.Track.from_json(request.data)

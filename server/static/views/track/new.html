@@ -1,3 +1,43 @@
+
+<ul class="button-group even three-up">
+  <li><a href="#" class="button">Button 1</a></li>
+  <li><a href="#" class="button">Button 2</a></li>
+  <li><a href="#" class="button">Button 3</a></li>
+</ul>
+
+<div href="#" class="large button dropdown">
+  Template Type
+  <ul>
+    <li><a href="#">Original Track</a></li>
+    <li class="divider"></li>
+    <li><a href="#">Remix Track</a></li>
+    <li><a href="#">Mashup Track</a></li>
+  </ul>
+</div>
+
+
+<ul class="breadcrumbs">
+  <li><a href="#">Home</a></li>
+  <li class="current"><a href="#">Features</a></li>
+  <li class="unavailable"><a href="#">Gene Splicing</a></li>
+</ul>
+
+<label for="customDropdown">Dropdown Label</label>
+<select style="display:none;" id="customDropdown">
+  <option SELECTED>This is a dropdown</option>
+  <option>This is another option</option>
+  <option>Look, a third option</option>
+</select>
+<div class="custom dropdown">
+  <a href="#" class="current">This is a dropdown</a>
+  <a href="#" class="selector"></a>
+  <ul>
+    <li>This is a dropdown</li>
+    <li>This is another option</li>
+    <li>Look, a third option</li>
+  </ul>
+</div>
+
 <div id="track_container">
     <div id="track_generated_title">
 		  <span ng-repeat="artist in form.artist_info[0].artists">
@@ -17,11 +57,20 @@
         <label>Artists:</label>
         [ <a href="" ng-click="add_artist()">add</a> ]
         <div ng-repeat="artist in form.artist_info[0].artists">
-          <select ng-model="artist.type">
-            <option>primary</option>
-            <option>vocalist</option>
-          </select>
-          <input type="text" ng-model="artist.name" ng-change="generate_title()" ui-event="{ focus: 'artist.$$edit = true', blur : 'artist.$$edit = false' }" required/>
+          <div class="row collapse">
+            <div class="four columns">
+              <select class="prefix custom" ng-model="artist.type">
+                <option>primary</option>
+                <option>vocalist</option>
+              </select>
+            </div>
+
+            <div class="eight columns">
+              <input type="text" ng-model="artist.name" ng-change="generate_title()" ui-event="{ focus: 'artist.$$edit = true', blur : 'artist.$$edit = false' }" required/>
+            </div>
+          </div>
+
+
            [ <a href="" ng-click="remove_artist(artist)">X</a> ]
         </div>
       <button ng-click="cancel()" ng-disabled="isCancelDisabled()">Cancel</button>

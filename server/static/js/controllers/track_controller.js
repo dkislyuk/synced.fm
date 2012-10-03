@@ -4,6 +4,9 @@ function TrackController($scope, $routeParams, Track) {
 
 
 function TrackFormsController($scope, Track) {
+  $(document).foundationButtons();
+  $(document).foundationCustomForms();
+
   var track = {
     title : '',
     artist_info : [{

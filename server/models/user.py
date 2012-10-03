@@ -24,5 +24,20 @@ class User(BaseModel):
         'username' : MinLengthValidator(3)
     }
     
+    def is_authenticated(self):
+        return True
+    
+    def is_active(self):
+        return True
+    
+    def is_anonymous(self):
+        return False
+    
+    def get_id(self):
+        return self.username
+    
     def set_password(self, password):
         self.password = "test"
+        
+    def to_json(self):
+        return {'username' : self.username, 'email' : self.email}

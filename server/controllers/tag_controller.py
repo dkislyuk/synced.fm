@@ -1,5 +1,5 @@
 from flask import Blueprint, request, current_app
-from models.tag import Tag
+from server.models.tag import Tag
 
 tag_api = Blueprint('tag_api', __name__)
 

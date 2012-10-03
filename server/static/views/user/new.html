@@ -1,9 +1,11 @@
-<div id="user_signup_container">
-	<form name="signup_form">
-		<input type="text" ng-model="form.email" placeholder="Email" required /><br />
-		<input type="password" ng-model="form.password" placeholder="Password" required /><br />
-		<input type="username" ng-model="form.username" placeholder="Username" required /><br />
+<div class="row">
+	<div class="six columns centered">
+		<form name="signup_form">
+			<input type="text" ng-model="form.email" placeholder="Email" required /><br />
+			<input type="password" ng-model="form.password" placeholder="Password" required /><br />
+			<input type="text" ng-model="form.username" placeholder="Username" required /><br />
 
-		<button ng-click="save()">Save</button>
-	</form>
+			<button class="input button" ng-click="save()">Go</button>
+		</form>
+	</div>
 </div>

@@ -1,14 +1,17 @@
 var module = angular.module('synced.services', ['ngResource']);
 
-// module.service('Track', function($http) {
-// 	this.get = function(id) {
-
-// 	};
+module.service('UserLogin', function($http) {
+	this.login = function(params) {
+		console.log("attempting with params: ", params);
+		$http.post('/api/user/login', params).success(function(data) {
+   			console.log("logged in ", data);
+   		});
+	};
 
 // 	this.create = function(data) {
 
 // 	};
-// });
+});
 
 
 module.factory('Track', function($resource) {
@@ -23,5 +26,11 @@ module.factory('Tag', function($resource) {
 	return $resource('/api/tag/:tag_id', 
 		{ tag_id: '@id' }, {
 
+	});
+});
+
+module.factory('User', function($resource) {
+	return $resource('/api/user/:username', 
+		{ tag_id: '@username' }, {
 	});
 });
