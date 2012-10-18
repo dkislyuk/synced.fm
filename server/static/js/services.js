@@ -1,17 +1,5 @@
+/* This module is a collection of models, which are simply RESTful resources */
 var module = angular.module('synced.services', ['ngResource']);
-
-module.service('UserLogin', function($http) {
-	this.login = function(params) {
-		console.log("attempting with params: ", params);
-		$http.post('/api/user/login', params).success(function(data) {
-   			console.log("logged in ", data);
-   		});
-	};
-
-// 	this.create = function(data) {
-
-// 	};
-});
 
 
 module.factory('Track', function($resource) {

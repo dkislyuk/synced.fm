@@ -4,6 +4,9 @@ function TrackController($scope, $routeParams, Track) {
 
 
 function TrackFormsController($scope, Track) {
+  $(document).foundationAlerts();
+  $(document).foundationTopBar();
+  $(document).foundationNavigation();
   $(document).foundationButtons();
   $(document).foundationCustomForms();
 
@@ -32,25 +35,11 @@ function TrackFormsController($scope, Track) {
  
   $scope.save = function() {
     var params = $scope.form;
-    console.log("saving...", params)
 
     Track.save(params, function(data) {
-      console.log("success: ", data);
+
     });
 
-  };
- 
-  $scope.addContact = function() {
-    $scope.form.contacts.push({type:'', value:''});
-  };
- 
-  $scope.removeContact = function(contact) {
-    var contacts = $scope.form.contacts;
-    for (var i = 0, ii = contacts.length; i < ii; i++) {
-      if (contact === contacts[i]) {
-        contacts.splice(i, 1);
-      }
-    }
   };
  
   $scope.isCancelDisabled = function() {
@@ -58,7 +47,7 @@ function TrackFormsController($scope, Track) {
   };
  
   $scope.isSaveDisabled = function() {
-    return false; //return $scope.track_form.$invalid || angular.equals(track, $scope.form);
+    return false;
   };
 
   /* Begin original track methods */

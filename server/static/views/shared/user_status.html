@@ -1,3 +1,9 @@
-<span ng-controller="UserStatusController">
-	User... {{status}}
-</span>
+<div ng-controller="LoginController">
+
+	<div ng-switch on="status">
+		<a ng-switch-when="login" href="#" data-reveal-id="login-modal" data-animation="none">Log In</a>
+		<div ng-switch-when="active">
+			{{name}}	
+		</div>
+	</div>
+</div>

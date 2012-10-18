@@ -1,83 +1,65 @@
-
-<ul class="button-group even three-up">
-  <li><a href="#" class="button">Button 1</a></li>
-  <li><a href="#" class="button">Button 2</a></li>
-  <li><a href="#" class="button">Button 3</a></li>
-</ul>
-
-<div href="#" class="large button dropdown">
-  Template Type
-  <ul>
-    <li><a href="#">Original Track</a></li>
-    <li class="divider"></li>
-    <li><a href="#">Remix Track</a></li>
-    <li><a href="#">Mashup Track</a></li>
-  </ul>
-</div>
-
-
-<ul class="breadcrumbs">
-  <li><a href="#">Home</a></li>
-  <li class="current"><a href="#">Features</a></li>
-  <li class="unavailable"><a href="#">Gene Splicing</a></li>
-</ul>
-
-<label for="customDropdown">Dropdown Label</label>
-<select style="display:none;" id="customDropdown">
-  <option SELECTED>This is a dropdown</option>
-  <option>This is another option</option>
-  <option>Look, a third option</option>
-</select>
-<div class="custom dropdown">
-  <a href="#" class="current">This is a dropdown</a>
-  <a href="#" class="selector"></a>
-  <ul>
-    <li>This is a dropdown</li>
-    <li>This is another option</li>
-    <li>Look, a third option</li>
+<div>
+  <ul class="breadcrumbs">
+    <li></li>
+    <li class="current"><a href="#">Start</a></li>
+    <li class="unavailable"><a href="#">Add Tags</a></li>
+    <li class="unavailable"><a href="#">Validate</a></li>
+    <li class="unavailable"><a href="#">Share</a></li>
+    
   </ul>
 </div>
 
 <div id="track_container">
-    <div id="track_generated_title">
+    <div id="track_generated_title" class="alert-box secondary">
 		  <span ng-repeat="artist in form.artist_info[0].artists">
 			 <span ng-class="{editing: artist.$$edit}">{{artist.name}}</span>
       </span>
-        <span>- </span><span ng-class="{editing: title_edit}">{{ form.title }}</span>	
+        <span>- </span><span ng-class="{editing: title_edit}">{{form.title}}</span>	
 
    	</div>
-    <hr/>
 
-      <form name="track_form">
-      	<div>
-      		<label>Title:</label><br/>
-        	<input type="text" ng-model="form.title" placeholder="Enter Title..." ui-event="{ focus: 'title_edit = true', blur : 'title_edit = false' }" required/> <br/><br/>
-        </div>
-
-        <label>Artists:</label>
-        [ <a href="" ng-click="add_artist()">add</a> ]
-        <div ng-repeat="artist in form.artist_info[0].artists">
-          <div class="row collapse">
-            <div class="four columns">
-              <select class="prefix custom" ng-model="artist.type">
-                <option>primary</option>
-                <option>vocalist</option>
-              </select>
-            </div>
-
-            <div class="eight columns">
-              <input type="text" ng-model="artist.name" ng-change="generate_title()" ui-event="{ focus: 'artist.$$edit = true', blur : 'artist.$$edit = false' }" required/>
-            </div>
+      <form name="track_form" class="custom">
+      	<div class="row">
+          <div class="two columns">
+      		  <label class="right inline">Title</label>
           </div>
-
-
-           [ <a href="" ng-click="remove_artist(artist)">X</a> ]
+          <div class="ten columns">
+        	 <input class="eight" type="text" ng-model="form.title" placeholder="Enter Title..." ui-event="{ focus: 'title_edit = true', blur : 'title_edit = false' }" required/>
+          </div>
         </div>
-      <button ng-click="cancel()" ng-disabled="isCancelDisabled()">Cancel</button>
-      <button ng-click="save()" ng-disabled="isSaveDisabled()">Save</button>
+
+        <div class="row">
+          <div class="two columns">
+            <label class="right inline">Artists</label>
+          </div>
+          <div class="ten columns">
+            <div ng-repeat="artist in form.artist_info[0].artists">
+              <div class="row collapse">
+                <div class="six columns">
+                  <input type="text" ng-model="artist.name" ng-change="generate_title()" ui-event="{ focus: 'artist.$$edit = true', blur : 'artist.$$edit = false' }" required/>
+                </div>
+
+                <div class="five columns">
+                  <span class="postfix">
+                  <select ng-model="artist.type" style="display:none;" id="customDropdown">
+                    <option SELECTED>Primary</option>
+                    <option>Vocalist</option>
+                  </select>
+                  </span>
+                </div>
+
+                <div class="one column">
+                </div>
+              </div>
+            </div>
+
+            <div><a href="" ng-click="add_artist()">add</a> </div>
+          </div>
+        </div>
+      <br />
+      <button class="secondary medium button" ng-click="cancel()" ng-disabled="isCancelDisabled()">Cancel</button>
+      <button class="secondary medium button" ng-click="save()" ng-disabled="isSaveDisabled()">Save</button>
     </form>
-    <hr/>
-    Debug View:
-    <pre>form={{form}}</pre>
+
 
 </div>

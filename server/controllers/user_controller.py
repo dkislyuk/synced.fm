@@ -26,15 +26,17 @@ def create_user():
 
 @user_api.route('/api/user/login', methods=['POST'])
 def login_user_func():
-    username = json.loads(request.data)['username']
-    connection = db.get_connection([User])
+    return "dkislyuk"
     
-    u = connection.User.find_one({"username" : username})
-    #User = connection.find_one(username)
-    
-    login_user(u)
-    
-    return u
+#    username = json.loads(request.data)['username']
+#    connection = db.get_connection([User])
+#    
+#    u = connection.User.find_one({"username" : username})
+#    #User = connection.find_one(username)
+#    
+#    login_user(u)
+#    
+#    return u
 
 @login_manager.user_loader
 def load_user(username):
