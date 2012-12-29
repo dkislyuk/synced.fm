@@ -1,9 +1,9 @@
-from flask import _app_ctx_stack
-from flask import Flask, jsonify, render_template, url_for, request
+#from flask import _app_ctx_stack
+from flask import Flask, jsonify
 #from flask.ext.mongoengine import MongoEngine
 from flask.ext.login import *
 
-import server.db
+from server import db
 
 
 # Global JSON return

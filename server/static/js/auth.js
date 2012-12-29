@@ -1,4 +1,4 @@
-/* Auth module, with a controller for the site-wide modal-window login and a service to 
+/* Auth module, with a controller for the site-wide modal-window login and a service to
 		to check user status at the initial app load */
 var auth = angular.module('synced.auth', []);
 
@@ -14,6 +14,7 @@ auth.controller({
     $scope.submit = function() {
     	$http.post('/api/user/login', $scope.form).
     		success(function(data) {
+          console.log(data);
 	   	  	$rootScope.user = data;
 	   	  	authService.loginConfirmed();
    			}).
@@ -23,9 +24,10 @@ auth.controller({
     };
 
     $scope.$on('event:auth-loginConfirmed', function(e) {
-    	/* Dismiss modal */
+      $('#login-modal').trigger('reveal:close');
+      $scope.name = $rootScope.user.username;
+
 			$scope.status = 'active';
-			$scope.name = $rootScope.user.name;
 		});
 
 		$scope.$on('event:auth-loginRequired', function(e) {
@@ -38,6 +40,7 @@ auth.controller({
 		});
 
 		$scope.status = 'login';
+    $scope.name = 'blank'
   }
 });
 
@@ -66,18 +69,18 @@ auth.provider('authService', function() {
    * so they can be re-requested in future, once login is completed.
    */
   var buffer = [];
-  
+
   /**
    * Required by HTTP interceptor.
    * Function is attached to provider to be invisible for regular users of this service.
    */
   this.pushToBuffer = function(config, deferred) {
     buffer.push({
-      config: config, 
+      config: config,
       deferred: deferred
     });
   }
-  
+
   this.$get = ['$rootScope','$injector', function($rootScope, $injector) {
     var $http; //initialized later because of circular dependency problem
     function retry(config, deferred) {
