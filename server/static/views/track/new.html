@@ -1,22 +1,13 @@
-<div>
-  <ul class="breadcrumbs">
-    <li></li>
-    <li class="current"><a href="#">Start</a></li>
-    <li class="unavailable"><a href="#">Add Tags</a></li>
-    <li class="unavailable"><a href="#">Validate</a></li>
-    <li class="unavailable"><a href="#">Share</a></li>
-    
-  </ul>
-</div>
 
 <div id="track_container">
     <div id="track_generated_title" class="alert-box secondary">
 		  <span ng-repeat="artist in form.artist_info[0].artists">
 			 <span ng-class="{editing: artist.$$edit}">{{artist.name}}</span>
       </span>
-        <span>- </span><span ng-class="{editing: title_edit}">{{form.title}}</span>	
+        <span>- </span><span ng-class="{editing: title_edit}">{{form.title}}</span>
 
    	</div>
+
 
       <form name="track_form" class="custom">
       	<div class="row">
@@ -35,25 +26,21 @@
           <div class="ten columns">
             <div ng-repeat="artist in form.artist_info[0].artists">
               <div class="row collapse">
-                <div class="six columns">
+                <div class="eight columns">
                   <input type="text" ng-model="artist.name" ng-change="generate_title()" ui-event="{ focus: 'artist.$$edit = true', blur : 'artist.$$edit = false' }" required/>
                 </div>
 
-                <div class="five columns">
-                  <span class="postfix">
-                  <select ng-model="artist.type" style="display:none;" id="customDropdown">
-                    <option SELECTED>Primary</option>
-                    <option>Vocalist</option>
-                  </select>
-                  </span>
-                </div>
 
-                <div class="one column">
+
+                <div class="two columns">
+
                 </div>
               </div>
             </div>
 
             <div><a href="" ng-click="add_artist()">add</a> </div>
+
+
           </div>
         </div>
       <br />

@@ -1,19 +1,20 @@
 from base import BaseModel
-from mongokit import Connection
+#from mongokit import Connection
+
 
 class Track(BaseModel):
     __collection__ = 'tracks'
 
     structure = {
         'track_id': int,
-        'title' : basestring,
-        'artist_info' : [{
-            'artists' : [{
+        'title':    basestring,
+        'artist_info': [{
+            'artists': [{
                 'name': basestring,
                 'type': basestring
             }],
-            'artist_format' : basestring,
-            'from_track' : int,
+            'artist_format': basestring,
+            'from_track': int,
             'hidden': []
         }],
         'base_track': [],

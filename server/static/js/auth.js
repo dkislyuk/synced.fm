@@ -45,10 +45,18 @@ auth.controller({
 });
 
 /* User Status Controller */
-auth.service('userService', function($rootScope, $http, authService) {
+auth.service('userService', function($rootScope, $location, authService) {
 	/* Logs in the user on initial app load */
 	this.status = function() {
 
+  }
+
+  /* Call this when signup is complete */
+  this.signupComplete = function(data) {
+    $rootScope.user = data;
+    authService.loginConfirmed();
+
+    $location.path('/track/new');
   }
 
   /* Logs out user */
