@@ -1,7 +1,6 @@
-import sys
 from server import db
 
-from flask import Blueprint, request, current_app
+from flask import Blueprint, request
 from server.models.track import Track
 
 track_api = Blueprint('track_api', __name__)
@@ -12,6 +11,7 @@ def create_track():
     connection = db.get_connection([Track])
     track = connection.Track.from_json(request.data)
 
+    track.initialize()
     track.save()
 
     return track
@@ -24,8 +24,7 @@ def update_track():
 
 @track_api.route('/api/track/0', methods=['GET'])
 def get_empty_track():
-    #connection = db.get_connection([Track])
-    return Track()
+    return db.get_connection([Track]).Track()
 
 
 @track_api.route('/api/track', methods=['GET'])

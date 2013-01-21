@@ -1,34 +1,34 @@
 /* This module is a collection of models, which are simply RESTful resources */
-var module = angular.module('synced.services', ['ngResource']);
+var module = angular.module('synced.services', []);
 
-
-module.factory('Track', function($resource) {
-	/* If the parameter value is prefixed with @ then the value of that parameter is extracted from the data object (useful for non-GET operations). */
-	return $resource('/api/track/:track_id',
-		{ track_id: '@id' }, {
-
-	});
-});
-
-module.factory('Track2', function($http) {
-	/* If the parameter value is prefixed with @ then the value of that parameter is extracted from the data object (useful for non-GET operations). */
-	return {
-		get : function(id) {
-			console.log("id whooo", id);
-		}
+module.service('GenericAPI', function($http) {
+	this.get_id = function() {
 
 	};
 });
 
-module.factory('Tag', function($resource) {
-	return $resource('/api/tag/:tag_id',
-		{ tag_id: '@id' }, {
+module.factory('Track', function($http) {
+  // Book is a class which we can use for retrieving and
+  // updating data on the server
+  var Track = function(data) {
+    angular.extend(this, data);
+  };
 
-	});
-});
+  // a static method to retrieve Book by ID
+  Track.get = function(id) {
+    return $http.get('/api/track/' + id).then(function(response) {
+      return new Track(response.data);
+    });
+  };
 
-module.factory('User', function($resource) {
-	return $resource('/api/user/:username',
-		{ tag_id: '@username' }, {
-	});
+  // an instance method to create a new Book
+  Track.prototype.create = function() {
+    var book = this;
+    return $http.post('/api/track', book).then(function(response) {
+      book.id = response.data.id;
+      return book;
+    });
+  };
+
+  return Track;
 });

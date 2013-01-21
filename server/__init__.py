@@ -5,16 +5,15 @@ from flask.ext.login import *
 
 from server import db
 
-
 # Global JSON return
 class MyFlask(Flask):
     def make_response(self, rv):
         if hasattr(rv, 'to_json'):
-            return jsonify(rv.to_json())
+            return jsonify(rv.get_json())
         return Flask.make_response(self, rv)
 
 app = MyFlask(__name__)
-app.config.from_pyfile('config/app.conf')
+app.config.from_object('config')
 #db_engine = MongoEngine(app)
 #db_engine.init_app(app)
 

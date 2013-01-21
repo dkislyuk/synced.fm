@@ -3,29 +3,25 @@ function TrackController($scope, $routeParams, Track) {
 }
 
 
-function TrackFormsController($scope, Track, Track2) {
-  //var track = Track.get({id: '0'});
-  Track2.get(1);
+function TrackFormsController($scope, Track) {
+  // Track.get(0).then(function(t) {
+  //   track = t;
+  //   console.log(t);
+  //   $scope.form = angular.copy(track);
+  // });
 
-  //console.log(track);
-  // var track = {
-  //   title : '',
-  //   artist_info : [{
-  //     artists : [{
-  //       name: '',
-  //       type: 'primary'
-  //     }],
-  //     artist_format : '',
-  //     from_track: 0,
-  //     hidden: []
-  //   }],
-  //   base_track: [],
-  //   track_id: 0,
-  //   modifier: {},
-  //   derivatives: [],
-  //   mixes: [],
-  //   tags: []
-  // };
+
+  var track = new Track();
+  track.title = '';
+  track.artist_info = [{
+      artists : [{
+        name: '',
+        type: 'primary'
+      }],
+      artist_format : '',
+      from_track: 0,
+      hidden: []
+    }];
 
   $scope.cancel = function() {
     $scope.form = angular.copy(track);
@@ -34,12 +30,10 @@ function TrackFormsController($scope, Track, Track2) {
   $scope.save = function() {
     var params = $scope.form;
 
-
     console.log("saving with: ", params);
-    Track.save(params, function(data) {
-      console.log(data);
+    track.create().then(function(resp) {
+      console.log(resp);
     });
-
   };
 
   $scope.isCancelDisabled = function() {
@@ -66,5 +60,6 @@ function TrackFormsController($scope, Track, Track2) {
       if (artist === artists[i]) artists.splice(i, 1);
     }
   };
+
   $scope.cancel();
 }
