@@ -14,6 +14,11 @@ app.config(['$routeProvider','$locationProvider', function($routeProvider, $loca
       /* User routing */
       when('/signup',            { templateUrl: '/static/views/user/new.html',    controller: UserSignupController}).
 
+      /* Training */
+      when('/training/new',      { templateUrl: '/static/views/training/new.html', controller: TrackController}).
+      when('/training/:train_id',{ templateUrl: '/static/views/training/index.html', controller: TrackController}).
+
+
       /* Authentication */
       when('/login',             { templateUrl: '/static/views/user/login.html'}).
       otherwise({redirectTo: '/track/new'});
