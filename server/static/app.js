@@ -15,8 +15,8 @@ app.config(['$routeProvider','$locationProvider', function($routeProvider, $loca
       when('/signup',            { templateUrl: '/static/views/user/new.html',    controller: UserSignupController}).
 
       /* Training */
-      when('/training/new',      { templateUrl: '/static/views/training/new.html', controller: TrackController}).
-      when('/training/:train_id',{ templateUrl: '/static/views/training/index.html', controller: TrackController}).
+      when('/training/new',      { templateUrl: '/static/views/training/new.html', controller: TrainingFormsController}).
+      when('/training/:train_id',{ templateUrl: '/static/views/training/index.html', controller: TrainingController}).
 
 
       /* Authentication */
@@ -25,6 +25,9 @@ app.config(['$routeProvider','$locationProvider', function($routeProvider, $loca
 }]);
 
 app.run(function(userService) {
+  /* Set up filepicker */
+  filepicker.setKey('AwD7l5ELaRxPijG4fH2EAz');
+
   /* Attempt to log in user */
   userService.status();
 });

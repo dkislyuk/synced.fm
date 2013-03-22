@@ -23,14 +23,40 @@ module.factory('Track', function($http) {
 
   // an instance method to create a new Track
   Track.prototype.create = function() {
-    var book = this;
-    return $http.post('/api/track', book).then(function(response) {
-      book.id = response.data.id;
-      return book;
+    var track = this;
+    return $http.post('/api/track', track).then(function(response) {
+      track.id = response.data.id;
+      return track;
     });
   };
 
   return Track;
 });
 
+
+module.factory('TrainingSet', function($http) {
+  // Track is a class which we can use for retrieving and
+  // updating data on the server
+  var TrainingSet = function(data) {
+    angular.extend(this, data);
+  };
+
+  // a static method to retrieve Track by ID
+  TrainingSet.get = function(id) {
+    return $http.get('/api/training_set/' + id).then(function(response) {
+      return new Track(response.data);
+    });
+  };
+
+  // an instance method to create a new Track
+  TrainingSet.prototype.create = function() {
+    var training_set = this;
+    return $http.post('/api/training_set', training_set).then(function(response) {
+      training_set.id = response.data.id;
+      return training_set;
+    });
+  };
+
+  return TrainingSet;
+});
 

@@ -18,7 +18,6 @@ The mobile Android app to provide recording & display capabilities is not curren
 
 The classifier runs inside the `classifier/audio.py` file, while the Flask API server resides in `app.py`. The AngularJS app which renders the web app is found at `static/app.js`.
 
-
 Installation
 ---------------------
 
