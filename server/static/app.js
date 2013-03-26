@@ -1,5 +1,5 @@
 var app = angular.module('synced', ['synced.auth', 'synced.services', 'synced.directives']);
-  
+
 app.config(['$routeProvider','$locationProvider', function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true),
     $routeProvider.

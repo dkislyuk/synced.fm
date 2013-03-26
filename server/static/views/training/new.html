@@ -1,3 +1,21 @@
 new training set
 
 <button class="secondary medium button" ng-click="pickFiles()">Pick Files</button>
+
+
+<form name="training_form" class="custom">
+<div ng-repeat="file in files">
+<div class="row">
+  <div class="six columns">
+    <span>{{file.filename}}
+  </div>
+  <div class="six columns">
+    <input type="text" ng-model="file.label" />
+  </div>
+</div>
+</div>
+
+</form>
+
+
+<button class="secondary medium button" ng-click="save()">Train Set</button>
