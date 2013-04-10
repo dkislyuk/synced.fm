@@ -1,21 +1,112 @@
-new training set
-
-<button class="secondary medium button" ng-click="pickFiles()">Pick Files</button>
-
-
 <form name="training_form" class="custom">
+
+<div class="row">
+  <div class="five columns">
+    <label class="right inline">Training Set Name</label>
+  </div>
+  <div class="five columns">
+   <input type="text" ng-model="name" required/>
+  </div>
+  <div class="two columns">
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="five columns">
+    <label class="right inline">MFCC Step Size</label>
+  </div>
+  <div class="two columns">
+   <input type="text" ng-model="config.mfcc_step_size" required/>
+  </div>
+  <div class="five columns">
+
+  </div>
+</div>
+<div class="row">
+  <div class="five columns">
+    <label class="right inline">MFCC Block Size</label>
+  </div>
+  <div class="two columns">
+   <input type="text" ng-model="config.mfcc_block_size" required/>
+  </div>
+  <div class="five columns">
+    
+  </div>
+</div>
+<div class="row">
+  <div class="five columns">
+    <label class="right inline">GMM Components</label>
+  </div>
+  <div class="two columns">
+   <input type="text" ng-model="config.num_components" required/>
+  </div>
+  <div class="five columns">
+    
+  </div>
+</div>
+<div class="row">
+  <div class="five columns">
+    <label class="right inline">EM Epsilon (threshold)</label>
+  </div>
+  <div class="two columns">
+   <input type="text" ng-model="config.em_epsilon" required/>
+  </div>
+  <div class="five columns">
+    
+  </div>
+</div>
+<div class="row">
+  <div class="five columns">
+    <label class="right inline">EM Iterations</label>
+  </div>
+  <div class="two columns">
+   <input type="text" ng-model="config.em_iter" required/>
+  </div>
+  <div class="five columns">
+    
+  </div>
+
+</div>
+<div class="row">
+  <div class="five columns">
+    <label class="right inline">Launch Filepicker</label>    
+  </div>
+  <div class="seven columns">
+<button class="secondary medium button" ng-click="pickFiles()">Pick Files</button>
+  </div>
+</div>
+
+<br />
+<div class="row" ng-show="selected">
+  <div class="five columns">
+
+  </div>
+  <div class="seven columns">
+    <label>Label</label>
+  </div>
+</div>
+
+
 <div ng-repeat="file in files">
 <div class="row">
-  <div class="six columns">
-    <span>{{file.filename}}
+  <div class="five columns">
+    <label class="right inline">{{file.filename}}<label>
   </div>
-  <div class="six columns">
+  <div class="five columns">
     <input type="text" ng-model="file.label" />
   </div>
+  <div class="two columns">
+  </div>
 </div>
 </div>
+
+
+
+
 
 </form>
 
+<button class="secondary medium button" ng-click="reset()">Reset Forms</button>
 
 <button class="secondary medium button" ng-click="save()">Train Set</button>

@@ -13,7 +13,7 @@ user_api = Blueprint('user_api', __name__)
 @user_api.route('/api/user/<user_id>', methods=['GET'])
 def get_user(user_id):
 
-    login_user(user_id)
+    #login_user(user_id)
 
     pass
 
@@ -32,15 +32,15 @@ def create_user():
 def login_user_func():
 #  return "dkislyuk"
 
-   username = json.loads(request.data)['username']
-   connection = db.get_connection([User])
-
-   u = connection.User.find_one({"username" : username})
-   # check that exists here
-
-   login_user(u)
-
-   return u
+    username = json.loads(request.data)['username']
+    connection = db.get_connection([User])
+    
+    u = connection.User.find_one({"username" : username})
+    # check that exists here
+    
+    #login_user(u)
+    
+    return u
 
 
 @login_manager.user_loader

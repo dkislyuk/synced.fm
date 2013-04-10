@@ -3,6 +3,8 @@ from yaafelib import *
 from sklearn.mixture import GMM
 import heapq
 
+import math
+
 from models import TrackData
 from models import DataSet
 from mongokit import Connection
@@ -90,7 +92,7 @@ def train(tracks, training_audio_path, conf, set_name, conn_str):
 def classify(train_set, classify_path):
     config = train_set.config
     
-    afp, engine = get_engine(config.audio_freq, config.mfcc_block_size, config.mfcc_step_size)
+    afp, engine = get_engine(train_set.config.audio_freq, config.mfcc_block_size, config.mfcc_step_size)
     afp.processFile(engine, classify_path)
 
     input_data = engine.readAllOutputs()['mfcc'][100:100 + train_set.audio_block_size()]
@@ -99,8 +101,11 @@ def classify(train_set, classify_path):
 
     p_eval = classifier.eval(input_data)[0]
     
-    results = []
-    for key, track_samples in train_set:
+    ordered_scores = []
+    results = {}
+    for key, track_samples in train_set.get_tracks():
+        
+        track_scores = []
         for datum in track_samples:
             gmm = GMM(n_components = config.num_components, cvtype = config.cv_type)    
             gmm._set_means(datum[0])
@@ -112,16 +117,30 @@ def classify(train_set, classify_path):
             kld = 0.0
             
             for i in xrange(input_data.shape[0]):
+                if p_eval[i] <= 0 or q_eval[i] <= 0: continue
                 KL_pq = p_eval[i] * np.log(p_eval[i] / q_eval[i])
                 KL_qp = q_eval[i] * np.log(q_eval[i] / p_eval[i])
                 
                 kld += KL_pq + KL_qp
     
-            heapq.heappush(results, (kld, key))
+            heapq.heappush(track_scores, kld)
+        
+        # use heaps, because we want to extend this in the future to take top k results of every track   
+        results[key] = heapq.heappop(track_scores)
+        heapq.heappush(ordered_scores, results[key])
 
-
-
-    k = 400
-    for _ in xrange(k):
-        print heapq.heappop(results)
+    score_list = results.values()
+    num_entries = len(score_list)
+    diff_sum = 0.0
     
+    for i in range(num_entries):
+        for j in range(num_entries - i - 1):
+            diff_sum += math.fabs(score_list[i] - score_list[j + i + 1])
+            
+    diff_avg = diff_sum / (((num_entries - 1) * num_entries) / 2)
+    diff_computed_label = -1 * (heapq.heappop(ordered_scores) - heapq.heappop(ordered_scores))
+    
+    print diff_avg
+    print results
+    
+    print diff_computed_label * diff_avg

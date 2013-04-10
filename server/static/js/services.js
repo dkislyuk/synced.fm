@@ -44,7 +44,8 @@ module.factory('TrainingSet', function($http) {
   // a static method to retrieve Track by ID
   TrainingSet.get = function(id) {
     return $http.get('/api/training_set/' + id).then(function(response) {
-      return new Track(response.data);
+      console.log("got the response: ", response);
+      return new TrainingSet(response.data);
     });
   };
 
@@ -52,7 +53,9 @@ module.factory('TrainingSet', function($http) {
   TrainingSet.prototype.create = function() {
     var training_set = this;
     return $http.post('/api/training_set', training_set).then(function(response) {
-      training_set.id = response.data.id;
+      console.log("resp: ", response);
+
+      training_set.id = response.data;
       return training_set;
     });
   };

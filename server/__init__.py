@@ -21,12 +21,17 @@ db.init_app(app)
 login_manager = LoginManager()
 login_manager.setup_app(app)
 
+
+#app.logger.debug('A value for debugging')
+
 from server.controllers.track_controller import track_api
 from server.controllers.tag_controller import tag_api
 from server.controllers.user_controller import user_api
+from server.controllers.training_controller import training_api
 
 app.register_blueprint(track_api)
 app.register_blueprint(tag_api)
 app.register_blueprint(user_api)
+app.register_blueprint(training_api)
 
 import server.views

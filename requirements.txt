@@ -7,3 +7,4 @@ pymongo==2.2.1
 wsgiref==0.1.2
 flask-login
 flask-mongoengine==0.6
+requests=1.1.0
