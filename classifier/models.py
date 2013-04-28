@@ -37,7 +37,7 @@ class DataSet(Document):
     __collection__ = "dataset"
     use_dot_notation = True
     use_autorefs = True
-    skip_validation = True
+    #skip_validation = True
     
     structure = {
       'name' : basestring,
@@ -48,13 +48,15 @@ class DataSet(Document):
                  'em_epsilon'        : float,
                  'em_iter'           : int,
                  'audio_freq'        : int,
-                 'block_overlap'     : int,
+                 'sample_step_size'  : int,
+                 'sample_length'     : int,
                  'cv_type'           : basestring
                  },
       'data': [],
       's3_links': [],
       'status': basestring,
-      'created_at': datetime.datetime
+      'created_at': datetime.datetime,
+      'default_validation_score': float
     }
     
     default_values = {
@@ -66,13 +68,15 @@ class DataSet(Document):
         'em_epsilon'        : 0.001,
         'em_iter'           : 100,
         'audio_freq'        : 16000,
-        'block_overlap'     : 5,
+        'sample_length'     : 5,
+        'sample_step_size'  : 1,
         'cv_type'           : 'diag'          
-      }
+      },
+     'default_validation_score': 0.0
     }
     
     def get_tracks(self):
-        connection = Connection(conn_str)
+        connection = Connection() if conn_str is None else Connection(conn_str)
         connection.register([TrackData])
         
         for track_id in self.data:
@@ -82,11 +86,11 @@ class DataSet(Document):
             
     def audio_block_size(self):
         frames_per_second   = self.config.audio_freq / self.config.mfcc_step_size
-        audio_block_size    = self.config.block_overlap * frames_per_second
+        audio_block_size    = self.config.sample_length * frames_per_second
         return audio_block_size
     
     def delete_data(self):
-        connection = Connection(conn_str)
+        connection = Connection() if conn_str is None else Connection(conn_str)
         connection.register([TrackData])
         
         for track_id in self.data:
@@ -94,6 +98,7 @@ class DataSet(Document):
             track.delete()
             
         self.data = []
+        self.status = "deleted"
         self.save()
         
     def get_json(self):

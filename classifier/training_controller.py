@@ -1,13 +1,19 @@
 import audio
 import os
 import subprocess
+import copy
+
 
 from mongokit import Connection
 from mongokit import ObjectId
 
 from models import DataSet
 from conn import conn_str
+from conn import default_home
+from util import logger
 
+
+# BLOCK OVERLAP IS A MISNOMER... its SAMPLE LENGTH
 conf_default = {
     'mfcc_step_size'    : 256,
     'mfcc_block_size'   : 512,
@@ -15,18 +21,22 @@ conf_default = {
     'em_epsilon'        : 0.001,
     'em_iter'           : 100,
     'audio_freq'        : 16000,
-    'block_overlap'     : 5,
+    'sample_step_size'  : 1,
+    'sample_length'     : 5,
     'cv_type'           : 'diag'
 }
 
-default_home = '/home/ec2-user/train_data'
-
 class Trainer():
-    def __init__(self, set_id=None, set_name=None, base_folder=None, conf=conf_default):
-        self.connection = Connection(conn_str)
+    def __init__(self, set_id=None, set_name=None, base_folder=None, conf=conf_default):  
+        # REFACTOR THIS      
+        if conn_str is None:
+            self.connection = Connection()
+        else:
+            self.connection = Connection(conn_str)
+        
         self.connection.register([DataSet])
         
-        print "set_id: ", set_id
+        logger.log("begin training of set_id: %s" % set_id)
         
         if base_folder != None:
             default_home = base_folder
@@ -42,10 +52,15 @@ class Trainer():
         else:
             self.train_set = self.connection.DataSet.one({"_id": ObjectId(set_id)})
             
+            # Check for any other necessary config vars here
+            #if 'cv_type' not in self.train_set.config.keys():
+            #    self.train_set.config['cv_type'] = 'diag'
+            #    self.train_set.save()
+            
             print "obj:"
             print self.train_set.name
             #self.config = conf_default
-            
+
         self.folder_path = default_home + '/' + self.generate_name()
         self.validation_path = self.folder_path + '/validation/'
         
@@ -54,38 +69,48 @@ class Trainer():
 
     def create_folders(self):
         subprocess.call(['mkdir', self.folder_path], stdout=subprocess.PIPE)
-        subprocess.call(['mkdir', self.validation_path + '/validation/'], stdout=subprocess.PIPE)
+        subprocess.call(['mkdir', self.validation_path], stdout=subprocess.PIPE)
     
     # using user input to do labeling
-    def load_from_folder(self, resample):
+    def load_from_folder(self, resample, use_default_labels):
         os.chdir(self.folder_path)
         
         training_files = []
-        for filename in [f for f in os.listdir('.') if os.path.isfile(f)]:
-            print " enter label for '" + filename + "' >"
-            label = raw_input()
-            
-            if len(label) == 0: label = filename
-            print "label is %s\n" % label
-            
-            target = filename
-            if (resample):
-                print "resampling in 16000..."
-                target = 'resample_' + filename
-                try:
-                    subprocess.call(['/usr/local/bin/lame', '-V5', '--vbr-new', '--resample', '16', filename, target], 
-                                    stdout=subprocess.PIPE)
-                except:
-                    print " could not resample file '%s'!" % filename
+        if use_default_labels:
+            for filename in [f for f in os.listdir('.') if os.path.isfile(f)]:
+                label = filename.replace('_', ' ').replace('.mp3', '').title()
+                training_files.append((label, filename))
                 
-            training_files.append((label, target))
-
-        print 'finished resampling!'
+                print "Using %s with label %s" % (filename, label)
+        else:    
+            resample_prefix = 'resample_'
+            for filename in [f for f in os.listdir('.') if os.path.isfile(f)]:
+                print " enter label for '" + filename + "' >"
+                label = raw_input()
+                
+                if len(label) == 0: label = filename
+                print "label is %s\n" % label
+                
+                target = filename
+                if resample:
+                    print "resampling in 16000..."
+                    target = resample_prefix + filename
+                    try:
+                        subprocess.call(['/usr/local/bin/lame', '-V5', '--vbr-new', '--resample', '16', filename, target], 
+                                        stdout=subprocess.PIPE)
+                        
+                        generated_name = label.strip().replace(" ", "_").lower() + '.mp3'
+                        subprocess.call(['rm', filename])
+                        subprocess.call(['mv', target, generated_name])
+                        
+                        training_files.append((label, generated_name))
+                    except:
+                        print " could not resample file '%s'!" % filename
+                else:
+                    training_files.append((label, target))
+            print 'finished resampling!'
         
-        self.train_set.data = [ObjectId('5151e437cb32158bbc000001'), ObjectId('5151e481cb32158bbc000002'), ObjectId('5151e4a4cb32158bbc000003'), ObjectId('5151e4dfcb32158bbc000004'), ObjectId('5151e513cb32158bbc000005')]
-#audio.train(training_files, self.folder_path, conf_default, self.train_set.name, conn_str)
-        
-
+        self.train_set.data = audio.train(training_files, self.folder_path, self.train_set.config, self.train_set.name, conn_str)
         self.train_set.s3_links = []
         self.train_set.status = "trained"
         
@@ -104,17 +129,17 @@ class Trainer():
                 
                 label = track['label']
                 url = track['url']
-                filename = track['filename']
+                #filename = track['filename'] 
                 
-                subprocess.call(['curl', '-X', 'GET', url], stdout=subprocess.PIPE)
+                print "fetching: ", url        
+                        
+                subprocess.call(['curl', '-O', url], stdout=subprocess.PIPE)
+                filename = url.split('/')[-1]
                 
-                
-                
-                # WONT WORK, gotta do a HEAD request to get the filename here
-                #filename = "track_" + str(i) + ".mp3"
-  
+                subprocess.call(['mv', filename, filename + '.mp3'])
+                filename = filename + '.mp3'
                 target = filename
-                if (resample):
+                if resample:
                     print "resampling in 16000..."
                     target = 'resample_' + filename
                     try:
@@ -130,49 +155,118 @@ class Trainer():
             
         print 'finished resampling!'
         
-        self.train_set.data = audio.train(training_files, self.folder_path, self.track_set.config, self.train_set.set_name, conn_str)
+        self.train_set.data = audio.train(training_files, self.folder_path, self.train_set.config, self.train_set.name, conn_str)
         self.train_set.status = "trained"
-        
-        
         self.train_set.save()
-            
- 
-    def train(self):
-        pass
-        
-    def validate(self, classify_path):        
-        #connection = Connection(conn_str)
-        #connection.register([DataSet])
-        
-        #train_set = connection.DataSet.one({"_id": ObjectId(training_set_id)})
+
+    def validate(self, classify_path = None):        
+        total_score = 0.0
+        K = 3
+
+        if classify_path is None:
+            for filename in [f for f in os.listdir(self.validation_path) if os.path.isfile(self.validation_path + f)]:
+                logger.log("classifying %s" % filename)
+                scores = audio.classify(self.train_set, self.validation_path + filename)
+                label = filename.replace('_', ' ').replace('.mp3', '').title()
+                
+                top_pick = scores[0]
+                second = scores[1]
+                third = scores[2]
+                fourth = scores[3]
+                
+                if top_pick[1] == label:
+                    # maybe should do avg  of the next top 10 score diffs instead?
+                    confidence_1 = (float(second[0]) - float(top_pick[0])) / float(second[0])
+                    confidence_2 = (float(third[0]) - float(top_pick[0])) / float(third[0])
+                    confidence_3 = (float(fourth[0]) - float(top_pick[0])) / float(fourth[0])
+                    
+                    total_score += (confidence_1 + confidence_2 + confidence_3) / float(K)
+                    print "classify correct"
+                    
+                else:
+                    print "incorrect classify %s %s" % (top_pick[1], label)
+                
+                print " first  > ", top_pick
+                print " second > ", second 
+                    
+        else:
+            audio.classify(self.train_set, self.validation_path + classify_path)   
     
-        audio.classify(self.train_set, self.validation_path + classify_path)
+        self.train_set.default_validation_score = total_score
+        self.train_set.save()
+           
+        return total_score
+        
+    def cleanup(self):
+        self.train_set.delete_data()
+        self.train_set.save()
 
 class Experiment():
-    def __init__(self):
-        pass
-    
-    #def run_experiment(self, *kwargs):
-    def run_experiment(self, param):
-        # USE PANDAS HERE
+    def test_gmm_params(self):
+        conf_test = copy.deepcopy(conf_default)
         
-        step_size = 0.1
-        min_val = 0
-        max_val = 1
+        num_components_min = 4
+        num_components_max = 8
+        num_components_step = 2
         
-        current = min_val
-        while (current <= max_val):
-            
-            current += step_size
-            
-            t = Trainer(set_name="exp")
+        em_iter_min = 50
+        em_iter_max = 200
+        em_iter_step_exp = 2
         
-        pass
+        mfcc_block_size_min = 256
+        mfcc_block_size_max = 1024
+        mfcc_block_size_step_exp = 2
         
+        num_components = num_components_min
+        em_iter = em_iter_min
+        mfcc_block_size = mfcc_block_size_min
+        
+        results = []
+        while num_components <= num_components_max:
+            while em_iter <= em_iter_max:
+                while mfcc_block_size <= mfcc_block_size_max:
+                    conf_test['num_components'] = num_components
+                    conf_test['mfcc_block_size'] = mfcc_block_size
+                    conf_test['mfcc_step_size'] = mfcc_block_size / 2
+                    conf_test['em_iter'] = em_iter
+                    
+                    t = Trainer(set_name = "galactica", base_folder = "/Users/dkislyuk/synced/audio/training_sets", conf=conf_test)
+                    training_set_id = t.load_from_folder(False, True)
+                    
+                    t2 = Trainer(set_id = training_set_id, base_folder = "/Users/dkislyuk/synced/audio/training_sets")
+                    validation_score = t2.validate()
 
-#t = Trainer(set_name = "set1", base_folder = "/Users/dkislyuk/synced/audio/training_sets")
-#training_set_id = t.load_from_folder(False)
+                    t2.cleanup()
+                    
+                    results.append([mfcc_block_size, num_components, em_iter, validation_score])
+                    
+                    mfcc_block_size *= mfcc_block_size_step_exp
+                
+                mfcc_block_size = mfcc_block_size_min
+                em_iter *= em_iter_step_exp
+            em_iter = em_iter_min
+            num_components += num_components_step
+        
+        print results
+        
+        
+e = Experiment()
+e.test_gmm_params()
+
+#t = Trainer(set_name = "galactica", base_folder = "/Users/dkislyuk/synced/audio/training_sets")
+# t = Trainer(set_name = "set1", base_folder = "/Users/dkislyuk/synced/audio/training_sets")
+
+#training_set_id = t.load_from_folder(False, True)
+
+#517485e6c1e3df0a29000000
+
 #t2 = Trainer(set_id = training_set_id, base_folder = "/Users/dkislyuk/synced/audio/training_sets")
 #t2.validate("pompo_boost_sped.mp3")
 
+
+#t2 = Trainer(set_id = "517485e6c1e3df0a29000000", base_folder = "/Users/dkislyuk/synced/audio/training_sets")
+#t2.validate()
+
 #todo resample validations
+
+

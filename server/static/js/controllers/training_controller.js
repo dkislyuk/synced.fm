@@ -14,16 +14,21 @@ function TrainingFormsController($scope, $location, TrainingSet) {
     'mfcc_block_size': 512,
     'num_components': 6,
     'em_epsilon': 0.01,
-    'em_iter': 100
+    'em_iter': 100,
+    'audio_freq': 16000,
+    'cv_type': 'diag',
+    'block_overlap': 5
   };
 
   $scope.pickFiles = function() {
-
-    $scope.files = [{"url":"https://www.filepicker.io/api/file/5wh3Ix5UTgWqvQXCv8bi","filename":"turntable  Trance Out!.html","mimetype":"text/html","size":5243,"isWriteable":true}];
+    $scope.files = [{"url":"https://www.filepicker.io/api/file/gR15U71kR1CJws5sh5VC","filename":"cherry_16000.mp3","mimetype":"audio/mpeg","size":1793822,"isWriteable":true}];
+    //$scope.files = [{"url":"https://www.filepicker.io/api/file/5wh3Ix5UTgWqvQXCv8bi","filename":"turntable  Trance Out!.html","mimetype":"text/html","size":5243,"isWriteable":true}];
     $scope.selected = true;
+
+
     // filepicker.pickMultiple(function(fpfiles) {
     //   $scope.files = fpfiles;
-
+    //   $scope.selected = true;
     //   // _.each(fpfiles, function(file) {
 
     //   // });

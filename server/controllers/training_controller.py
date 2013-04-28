@@ -20,7 +20,7 @@ def create_training_set():
     training_set.s3_links   = data['s3_links']
     training_set.name       = data['name']
     training_set.config     = data['config']
-    
+     
     training_set.save();
     
     payload = {'dataset_id': str(training_set._id)}
