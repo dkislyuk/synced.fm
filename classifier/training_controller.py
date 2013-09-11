@@ -1,19 +1,16 @@
 import audio
+import conn
+import copy
 import os
 import subprocess
-import copy
 
-
-from mongokit import Connection
 from mongokit import ObjectId
 
 from models import DataSet
+from conn import training_folder
 from conn import conn_str
-from conn import default_home
 from util import logger
 
-
-# BLOCK OVERLAP IS A MISNOMER... its SAMPLE LENGTH
 conf_default = {
     'mfcc_step_size'    : 256,
     'mfcc_block_size'   : 512,
@@ -23,27 +20,15 @@ conf_default = {
     'audio_freq'        : 16000,
     'sample_step_size'  : 1,
     'sample_length'     : 5,
-    'cv_type'           : 'diag'
+    'cv_type'           : 'full'
 }
 
 class Trainer():
-    def __init__(self, set_id=None, set_name=None, base_folder=None, conf=conf_default):  
-        # REFACTOR THIS      
-        if conn_str is None:
-            self.connection = Connection()
-        else:
-            self.connection = Connection(conn_str)
-        
+    def __init__(self, set_id=None, set_name=None, conf=conf_default):          
+        self.connection = conn.get();
         self.connection.register([DataSet])
-        
-        logger.log("begin training of set_id: %s" % set_id)
-        
-        if base_folder != None:
-            default_home = base_folder
-
+    
         if set_id == None:
-            
-            print "creating new set"
             self.train_set = self.connection.DataSet()
             self.train_set.config = conf
             self.train_set.name = set_name
@@ -51,17 +36,8 @@ class Trainer():
             self.train_set.save()
         else:
             self.train_set = self.connection.DataSet.one({"_id": ObjectId(set_id)})
-            
-            # Check for any other necessary config vars here
-            #if 'cv_type' not in self.train_set.config.keys():
-            #    self.train_set.config['cv_type'] = 'diag'
-            #    self.train_set.save()
-            
-            print "obj:"
-            print self.train_set.name
-            #self.config = conf_default
 
-        self.folder_path = default_home + '/' + self.generate_name()
+        self.folder_path = training_folder + '/' + self.generate_name()
         self.validation_path = self.folder_path + '/validation/'
         
     def generate_name(self):
@@ -81,7 +57,7 @@ class Trainer():
                 label = filename.replace('_', ' ').replace('.mp3', '').title()
                 training_files.append((label, filename))
                 
-                print "Using %s with label %s" % (filename, label)
+                logger.log("Using %s with label %s" % (filename, label))
         else:    
             resample_prefix = 'resample_'
             for filename in [f for f in os.listdir('.') if os.path.isfile(f)]:
@@ -89,11 +65,9 @@ class Trainer():
                 label = raw_input()
                 
                 if len(label) == 0: label = filename
-                print "label is %s\n" % label
                 
                 target = filename
                 if resample:
-                    print "resampling in 16000..."
                     target = resample_prefix + filename
                     try:
                         subprocess.call(['/usr/local/bin/lame', '-V5', '--vbr-new', '--resample', '16', filename, target], 
@@ -105,7 +79,7 @@ class Trainer():
                         
                         training_files.append((label, generated_name))
                     except:
-                        print " could not resample file '%s'!" % filename
+                        logger.warn(" could not resample file '%s'!" % filename)
                 else:
                     training_files.append((label, target))
             print 'finished resampling!'
@@ -175,14 +149,12 @@ class Trainer():
                 fourth = scores[3]
                 
                 if top_pick[1] == label:
-                    # maybe should do avg  of the next top 10 score diffs instead?
                     confidence_1 = (float(second[0]) - float(top_pick[0])) / float(second[0])
                     confidence_2 = (float(third[0]) - float(top_pick[0])) / float(third[0])
                     confidence_3 = (float(fourth[0]) - float(top_pick[0])) / float(fourth[0])
                     
                     total_score += (confidence_1 + confidence_2 + confidence_3) / float(K)
-                    print "classify correct"
-                    
+                    print "classify correct, confidence: ", (confidence_1 + confidence_2 + confidence_3) / float(K)
                 else:
                     print "incorrect classify %s %s" % (top_pick[1], label)
                 
@@ -190,7 +162,7 @@ class Trainer():
                 print " second > ", second 
                     
         else:
-            audio.classify(self.train_set, self.validation_path + classify_path)   
+            logger.log(audio.classify(self.train_set, self.validation_path + classify_path))   
     
         self.train_set.default_validation_score = total_score
         self.train_set.save()
@@ -199,14 +171,15 @@ class Trainer():
         
     def cleanup(self):
         self.train_set.delete_data()
+        self.status = "completed"
         self.train_set.save()
 
 class Experiment():
     def test_gmm_params(self):
         conf_test = copy.deepcopy(conf_default)
         
-        num_components_min = 4
-        num_components_max = 8
+        num_components_min = 5
+        num_components_max = 9
         num_components_step = 2
         
         em_iter_min = 50
@@ -214,8 +187,10 @@ class Experiment():
         em_iter_step_exp = 2
         
         mfcc_block_size_min = 256
-        mfcc_block_size_max = 1024
+        mfcc_block_size_max = 2048
         mfcc_block_size_step_exp = 2
+        
+        block_overlap = 2
         
         num_components = num_components_min
         em_iter = em_iter_min
@@ -225,20 +200,23 @@ class Experiment():
         while num_components <= num_components_max:
             while em_iter <= em_iter_max:
                 while mfcc_block_size <= mfcc_block_size_max:
-                    conf_test['num_components'] = num_components
-                    conf_test['mfcc_block_size'] = mfcc_block_size
-                    conf_test['mfcc_step_size'] = mfcc_block_size / 2
-                    conf_test['em_iter'] = em_iter
+                    conf_test['num_components']     = num_components
+                    conf_test['mfcc_block_size']    = mfcc_block_size
+                    conf_test['mfcc_step_size']     = mfcc_block_size / block_overlap
+                    conf_test['em_iter']            = em_iter
                     
-                    t = Trainer(set_name = "galactica", base_folder = "/Users/dkislyuk/synced/audio/training_sets", conf=conf_test)
+                    print ">>> begin: ", (mfcc_block_size, num_components, em_iter)
+                    
+                    t = Trainer(set_name = "galactica", conf=conf_test)
                     training_set_id = t.load_from_folder(False, True)
                     
-                    t2 = Trainer(set_id = training_set_id, base_folder = "/Users/dkislyuk/synced/audio/training_sets")
+                    t2 = Trainer(set_id = training_set_id)
                     validation_score = t2.validate()
 
                     t2.cleanup()
                     
                     results.append([mfcc_block_size, num_components, em_iter, validation_score])
+                    print ">>> completed: ", [mfcc_block_size, num_components, em_iter, validation_score]
                     
                     mfcc_block_size *= mfcc_block_size_step_exp
                 
@@ -249,19 +227,129 @@ class Experiment():
         
         print results
         
+    def test_all_params(self):
+        conf_test = copy.deepcopy(conf_default)
+        
+        num_components_min = 11
+        num_components_max = 12
+        num_components_step = 1
+
+        
+        mfcc_block_size_min = 512
+        mfcc_block_size_max = 2048
+        mfcc_block_size_step_exp = 2
+        
+        block_overlap_min = 2
+        block_overlap_max = 4
+        block_overlap_step_size = 2 
+        
+        num_components = num_components_min
+        mfcc_block_size = mfcc_block_size_min
+        block_overlap = block_overlap_min
+        
+        results = []
+        while num_components <= num_components_max:            
+            while block_overlap <= block_overlap_max:
+                while mfcc_block_size <= mfcc_block_size_max:
+                    
+                    conf_test['num_components']     = num_components
+                    conf_test['mfcc_block_size']    = mfcc_block_size
+                    conf_test['mfcc_step_size']     = mfcc_block_size / block_overlap
+
+                    print ">>> begin: ", (mfcc_block_size, num_components, block_overlap)
+                    
+                    t = Trainer(set_name = "galactica", conf=conf_test)
+                    training_set_id = t.load_from_folder(False, True)
+                    
+                    t2 = Trainer(set_id = training_set_id)
+                    validation_score = t2.validate()
+
+                    t2.cleanup()
+                    
+                    results.append([mfcc_block_size, num_components, block_overlap, validation_score])
+                    print ">>> completed: ", [mfcc_block_size, num_components, block_overlap, validation_score]
+                    
+                    mfcc_block_size *= mfcc_block_size_step_exp
+                
+                mfcc_block_size = mfcc_block_size_min
+                block_overlap += block_overlap_step_size
+            block_overlap = block_overlap_min
+            num_components += num_components_step
+        
+        print results
+        
+        
+    def test_covar_param(self):
+        conf_test = copy.deepcopy(conf_default)
+        
+        num_components_min = 4
+        num_components_max = 12
+        num_components_step = 1
+
+        mfcc_block_size_min = 512
+        mfcc_block_size_max = 2048
+        mfcc_block_size_step_exp = 2
+        
+        block_overlap_min = 2
+        block_overlap_max = 2
+        block_overlap_step_size = 2 
+        
+        num_components = num_components_min
+        mfcc_block_size = mfcc_block_size_min
+        block_overlap = block_overlap_min
+        
+        results = []
+        while num_components <= num_components_max:            
+            while block_overlap <= block_overlap_max:
+                while mfcc_block_size <= mfcc_block_size_max:
+                    
+                    conf_test['num_components']     = num_components
+                    conf_test['mfcc_block_size']    = mfcc_block_size
+                    conf_test['mfcc_step_size']     = mfcc_block_size / block_overlap
+
+                    print ">>> begin: ", (mfcc_block_size, num_components, block_overlap)
+                    
+                    t = Trainer(set_name = "galactica", conf=conf_test)
+                    training_set_id = t.load_from_folder(False, True)
+                    
+                    t2 = Trainer(set_id = training_set_id)
+                    validation_score = t2.validate()
+
+                    t2.cleanup()
+                    
+                    results.append([mfcc_block_size, num_components, block_overlap, validation_score])
+                    print ">>> completed: ", [mfcc_block_size, num_components, block_overlap, validation_score]
+                    
+                    mfcc_block_size *= mfcc_block_size_step_exp
+                
+                mfcc_block_size = mfcc_block_size_min
+                block_overlap += block_overlap_step_size
+            block_overlap = block_overlap_min
+            num_components += num_components_step
+        
+        print results
         
 e = Experiment()
-e.test_gmm_params()
+#e.test_gmm_params()
+#e.test_all_params()
+e.test_covar_param()
 
+
+#t_c = Trainer(set_id = "517d1139c1e3df1ea5000096")
+#t_c.train_set.default_validation_score = 11.8857716973
+#t_c.cleanup()
+
+#print t_c.validate()
+
+
+
+
+#t = Trainer(set_name = 'kickstarts', base_folder = "/Users/dkislyuk/synced/audio/training_sets")
 #t = Trainer(set_name = "galactica", base_folder = "/Users/dkislyuk/synced/audio/training_sets")
-# t = Trainer(set_name = "set1", base_folder = "/Users/dkislyuk/synced/audio/training_sets")
-
+#t = Trainer(set_name = "set1", base_folder = "/Users/dkislyuk/synced/audio/training_sets")
 #training_set_id = t.load_from_folder(False, True)
-
-#517485e6c1e3df0a29000000
-
 #t2 = Trainer(set_id = training_set_id, base_folder = "/Users/dkislyuk/synced/audio/training_sets")
-#t2.validate("pompo_boost_sped.mp3")
+#t2.validate("innocence.mp3")
 
 
 #t2 = Trainer(set_id = "517485e6c1e3df0a29000000", base_folder = "/Users/dkislyuk/synced/audio/training_sets")

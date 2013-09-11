@@ -70,7 +70,7 @@ class DataSet(Document):
         'audio_freq'        : 16000,
         'sample_length'     : 5,
         'sample_step_size'  : 1,
-        'cv_type'           : 'diag'          
+        'cv_type'           : 'full'          
       },
      'default_validation_score': 0.0
     }
@@ -98,7 +98,6 @@ class DataSet(Document):
             track.delete()
             
         self.data = []
-        self.status = "deleted"
         self.save()
         
     def get_json(self):
